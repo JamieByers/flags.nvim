@@ -40,6 +40,7 @@ function M.merge_tables(config, default)
 end
 
 function M.setup(config)
+    M.validate_config(config)
     M.merge_tables(config, default_config)
     return config
 end
