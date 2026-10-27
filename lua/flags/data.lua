@@ -86,7 +86,7 @@ function M.get_flags_data()
         local flag_data = vim.json.decode(content)
         return flag_data
     else
-        local flag_data = {[vim.loop.cwd()] = {}}
+        local flag_data = { [vim.loop.cwd()] = {} }
         M.update_wd_file(flag_data)
         return flag_data
     end
@@ -101,7 +101,6 @@ end
 
 function M.get_hashed_filepath()
     return M.get_data_path() .. "/" .. M.get_hashed_wd() .. ".json"
-
 end
 
 function M.get_data_path()
@@ -110,7 +109,6 @@ function M.get_data_path()
         error("Failed to get data path")
     end
     return data_path .. "/flags"
-
 end
 
 function M.get_hashed_wd()

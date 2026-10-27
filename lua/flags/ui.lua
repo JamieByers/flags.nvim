@@ -53,8 +53,8 @@ end
 function M.create_flag_lines(flags)
     local lines = {}
 
-    for i, flag in ipairs(flags) do
-        table.insert(lines, string.format("%s: %s line: %s", i, flag.path, flag.context.row))
+    for i, f in ipairs(flags) do
+        table.insert(lines, string.format("%s: %s line: %s %s", i, f.path, f.context.row, f.value))
     end
 
     return lines

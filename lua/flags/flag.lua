@@ -1,9 +1,17 @@
 local M = {}
 
 local data = require("flags.data")
+local state = require("flags.state")
 
 local NAMESPACE = vim.api.nvim_create_namespace('flags')
 
+-- for user custom keys
+function M.jump_to_index(index)
+    if index < #state.flags and index >= 0 then
+        local flag = state.flags[index]
+        M.jump(flag)
+    end
+end
 
 function M.jump(flag)
     local bufn = vim.fn.bufnr(flag.path, true)
@@ -26,10 +34,13 @@ function M.create(path, pos)
     local row = pos[1]
     local id = vim.api.nvim_buf_set_extmark(bufnr, NAMESPACE, row - 1, 0, {})
 
+    local value = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
+
     local flag = {
         path = path,
         id = id,
         bufnr = bufnr,
+        value = value,
         context = {
             row = row,
             col = 0
@@ -62,7 +73,7 @@ function M.render(flags)
 
         local pos = vim.api.nvim_buf_get_extmark_by_id(bufnr, NAMESPACE, id, {})
 
-        local text = i .. '⚑'
+        local text = i .. state.config.style.flag_symbol
         if i > 9 then
             text = tostring(i)
         end
@@ -71,7 +82,7 @@ function M.render(flags)
             vim.api.nvim_buf_set_extmark(bufnr, NAMESPACE, pos[1], pos[2], {
                 id = id,
                 sign_text = text,
-                sign_hl_group = "DiagnosticSignError",
+                sign_hl_group = "FlagsSign",
             })
         end
     end
@@ -84,9 +95,11 @@ function M.save(flags)
         if #pos > 0 then
             local f = {
                 path = flag.path,
-                line = pos[1] + 1
+                line = pos[1] + 1,
+                value = vim.api.nvim_buf_get_lines(flag.bufnr, pos[1], pos[1] + 1, false)[1]
             }
             flags[i].context.row = pos[1] + 1
+            flags[i].value = f.value
             table.insert(new_flags, f)
         end
     end

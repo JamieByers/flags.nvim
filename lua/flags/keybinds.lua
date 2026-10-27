@@ -4,15 +4,13 @@ local ui = require("flags.ui")
 local flag = require("flags.flag")
 local state = require("flags.state")
 
-function M.create_keybinds()
-    vim.keymap.set("n", "<leader>fm", function ()
-        ui.toggle_window()
-    end, {})
+local jump_prefix = "<leader>f"
 
-    vim.api.nvim_create_user_command("FlagInfo", function()
-        for i, f in ipairs(state.flags) do
-            print(i .. ": ", f.path, f.line)
-        end
+function M.create_keybinds()
+    jump_prefix = state.config.keybinds.jump_prefix or jump_prefix
+
+    vim.keymap.set("n", state.config.keybinds.toggle_window, function ()
+        ui.toggle_window()
     end, {})
 
     vim.keymap.set("n", "<leader>F", function()
@@ -27,18 +25,18 @@ function M.create_keybinds()
         M.refresh()
     end, { desc = "Create flag" })
 
-    vim.keymap.set("n", "<leader>fd", function()
+    vim.keymap.set("n", state.config.keybinds.delete_flag, function()
         state.flags = flag.delete(state.flags)
         M.refresh()
     end, { desc = "Delete flag" })
 
-    vim.api.nvim_create_user_command("Fwipe", function()
+    vim.api.nvim_create_user_command("WipeFlags", function()
         flag.wipe(state.flags)
         state.flags = {}
         M.refresh()
     end, {})
 
-    vim.keymap.set("n", "<leader>fW", function()
+    vim.keymap.set("n", state.config.keybinds.wipe_flags, function()
         flag.wipe(state.flags)
         state.flags = {}
         M.refresh()
@@ -61,7 +59,7 @@ end
 
 function M.update_jump_keybinds()
     for i, f in ipairs(state.flags) do
-        vim.keymap.set("n", "<leader>f" .. i, function()
+        vim.keymap.set("n", jump_prefix .. i, function()
             flag.jump(f)
         end)
     end
