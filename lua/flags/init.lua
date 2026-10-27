@@ -23,7 +23,6 @@ function M.create_keybinds()
         table.insert(flags, f)
         flag.render(flags)
         M.update_jump_keybinds()
-
     end, { desc = "Create flag" })
 
     vim.keymap.set("n", "<leader>fd", function()
@@ -47,8 +46,8 @@ function M.create_keybinds()
 end
 
 function M.update_jump_keybinds()
-    for _, f in ipairs(flags) do
-        vim.keymap.set("n", "<leader>f" .. f.id, function()
+    for i, f in ipairs(flags) do
+        vim.keymap.set("n", "<leader>f" .. i, function()
             flag.jump(f)
         end)
     end

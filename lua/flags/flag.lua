@@ -119,6 +119,8 @@ function M.delete(flags)
             and #flag_pos > 0
             and flag_pos[1] == pos[1] - 1 then
 
+            print("DELETING FLAG")
+
             vim.api.nvim_buf_del_extmark(
                 flag.bufnr,
                 NAMESPACE,
@@ -133,4 +135,5 @@ function M.delete(flags)
 
     return new_flags
 end
+
 return M
