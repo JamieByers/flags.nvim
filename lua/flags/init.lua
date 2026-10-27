@@ -2,14 +2,14 @@ local M = {}
 
 local flag = require("flags.flag")
 local keybinds = require("flags.keybinds")
-local flags = {}
+local state = require("flags.state")
 
 function M.setup()
-    flags = flag.load()
-    flag.render(flags)
+    state.flags = flag.load()
+    flag.render(state.flags)
 
-    keybinds.create_keybinds(flags)
-    keybinds.update_jump_keybinds(flags)
+    keybinds.create_keybinds()
+    keybinds.update_jump_keybinds()
 end
 
 return M

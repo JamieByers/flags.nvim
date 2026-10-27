@@ -8,7 +8,7 @@ local NAMESPACE = vim.api.nvim_create_namespace('flags')
 function M.jump(flag)
     local bufn = vim.fn.bufnr(flag.path, true)
     vim.api.nvim_set_current_buf(bufn)
-    vim.api.nvim_win_set_cursor(0, { flag.context.row, flag.context.col })
+    vim.api.nvim_win_set_cursor(0, { flag.context.row, 0 })
 end
 
 function M.create(path, pos)
@@ -24,7 +24,7 @@ function M.create(path, pos)
     vim.fn.bufload(bufnr)
 
     local row = pos[1]
-    local id = vim.api.nvim_buf_set_extmark(bufnr, NAMESPACE, row-1, 0, {})
+    local id = vim.api.nvim_buf_set_extmark(bufnr, NAMESPACE, row - 1, 0, {})
 
     local flag = {
         path = path,
@@ -84,9 +84,9 @@ function M.save(flags)
         if #pos > 0 then
             local f = {
                 path = flag.path,
-                line = pos[1]+1
+                line = pos[1] + 1
             }
-            flags[i].context.row = pos[1]+1
+            flags[i].context.row = pos[1] + 1
             table.insert(new_flags, f)
         end
     end
@@ -102,12 +102,13 @@ function M.wipe(flags)
     data.wipe_all_flags()
 end
 
-function M.delete(flags)
+function M.delete(flags, index)
+    index = index or -1
     local bufnr = vim.api.nvim_get_current_buf()
     local pos = vim.api.nvim_win_get_cursor(0)
     local new_flags = {}
 
-    for _, flag in ipairs(flags) do
+    for i, flag in ipairs(flags) do
         local flag_pos = vim.api.nvim_buf_get_extmark_by_id(
             flag.bufnr,
             NAMESPACE,
@@ -115,12 +116,9 @@ function M.delete(flags)
             {}
         )
 
-        if flag.bufnr == bufnr
-            and #flag_pos > 0
-            and flag_pos[1] == pos[1] - 1 then
-
-            print("DELETING FLAG")
-
+        if i == index or (flag.bufnr == bufnr
+                and #flag_pos > 0
+                and flag_pos[1] == pos[1] - 1) then
             vim.api.nvim_buf_del_extmark(
                 flag.bufnr,
                 NAMESPACE,
