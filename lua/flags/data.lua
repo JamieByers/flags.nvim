@@ -1,19 +1,8 @@
 local M = {}
 
 function M.save_flags(flags)
-    local namespaces = vim.api.nvim_get_namespaces()
-    local namespace = namespaces["flags"]
-
-    if not namespace then
-        namespace = vim.api.nvim_create_namespace("flags")
-    end
-
-    for _, flag in ipairs(flags) do
-        local pos = vim.api.nvim_buf_get_extmark_by_id(flag.bufnr, namespace, flag.id, {})
-        flag.context.row = pos[1] + 1
-    end
-
-    M.update_wd_file({ [vim.loop.cwd()] = flags } )
+    local cwd = vim.loop.cwd()
+    M.update_wd_file({ [cwd] = flags })
 end
 
 function M.wipe_all_flags()
@@ -29,13 +18,18 @@ function M.wipe_all_flags()
 end
 
 function M.add_flag_to_data(flag)
+    flag = {
+        path = flag.path,
+        line = flag.context.row,
+    }
+
     local flags_data = M.get_flags_data()
     local cwd = vim.loop.cwd()
 
     local flags = flags_data[cwd]
 
     for _, existing_flag in ipairs(flags) do
-        if existing_flag.path == flag.path and existing_flag.context.row == flag.context.row and existing_flag.context.col == flag.context.col then
+        if existing_flag.path == flag.path and existing_flag.line == flag.line then
             print("Flag already exists for this file")
             return
         end
@@ -46,12 +40,17 @@ function M.add_flag_to_data(flag)
 end
 
 function M.delete_flag_from_data(flag)
+    flag = {
+        path = flag.path,
+        line = flag.context.row,
+    }
+
     local flags_data = M.get_flags_data()
     local cwd = vim.loop.cwd()
 
     local flags = flags_data[cwd]
     for i, existing_flag in ipairs(flags) do
-        if existing_flag.path == flag.path and existing_flag.context.row == flag.context.row and existing_flag.context.col == flag.context.col then
+        if existing_flag.path == flag.path and existing_flag.line == flag.line then
             table.remove(flags, i)
             M.update_wd_file(flags_data)
             return
