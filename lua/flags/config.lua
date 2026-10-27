@@ -17,11 +17,10 @@ local default_config = {
 }
 
 function M.validate_config(config)
-    if #config.style.flag_symbol > 1 then
-        vim.notify("Flag symbol must be a single character, reverting to default", vim.log.levels.WARN)
+    if type(config.style.flag_symbol) ~= "string" or vim.fn.strchars(config.style.flag_symbol) ~= 1 then
+        vim.notify("Flag symbol must be a single character, using default instead.", vim.log.levels.WARN)
         config.style.flag_symbol = default_config.style.flag_symbol
     end
-
 end
 
 function M.merge_tables(config, default)
@@ -40,8 +39,8 @@ function M.merge_tables(config, default)
 end
 
 function M.setup(config)
-    M.validate_config(config)
     M.merge_tables(config, default_config)
+    M.validate_config(config)
     return config
 end
 

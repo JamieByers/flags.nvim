@@ -13,7 +13,7 @@ function M.create_keybinds()
         ui.toggle_window()
     end, {})
 
-    vim.keymap.set("n", "<leader>F", function()
+    vim.keymap.set("n", state.config.keybinds.create_flag, function()
         local f = flag.create()
         for _, existing_flag in ipairs(state.flags) do
             if existing_flag.path == f.path and existing_flag.context.row == f.context.row then
